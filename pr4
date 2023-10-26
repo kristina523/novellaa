@@ -1,0 +1,151 @@
+import json
+import csv
+
+class Novel:
+    def __init__(self, title):
+        self.title = title
+        self.chapters = []
+        self.counter = 0
+        self.game_data = []
+
+    class Chapter:
+        def __init__(self, title, content):
+            self.title = title
+            self.content = content
+            self.choices = []
+
+    def add_chapter(self, chapter):
+        self.chapters.append(chapter)
+
+    def print_story(self):
+        current_chapter = 0
+        while current_chapter < len(self.chapters):
+            chapter = self.chapters[current_chapter]
+            print(f"\nГлава {current_chapter + 1}: {chapter.title}")
+            print(chapter.content)
+            if chapter.choices:
+                choice = self.get_user_choice(chapter.choices)
+                next_chapter = chapter.choices[choice - 1]
+                print(f"\nВы выбрали: {next_chapter['title']}")
+                print(next_chapter['content'])
+                self.update_game_data(chapter.title, next_chapter['title'])
+                current_chapter = self.update_counter(current_chapter, choice)
+                if current_chapter is None:
+                    print("\nИгра окончена.")
+                    self.save_game_data()
+                    self.write_to_csv()
+                    return
+                elif current_chapter == 5 and choice == 1:
+                    print("\nИгра окончена.")
+                    self.save_game_data()
+                    self.write_to_csv()
+                    return
+            else:
+                current_chapter += 1
+        print("\nКонец истории.")
+        self.save_game_data()
+        self.write_to_csv()
+
+    def get_user_choice(self, choices):
+        while True:
+            print("Выберите вариант:")
+            for i, option in enumerate(choices, start=1):
+                print(f"{i}. {option['title']}")
+            choice = input("Введите номер выбранного варианта: ")
+            if choice.isdigit() and 1 <= int(choice) <= len(choices):
+                return int(choice)
+
+    def update_counter(self, current_chapter, choice):
+        if current_chapter == 3:
+            if choice == 1:
+                # Redirect to chapter 5
+                return 4
+            elif choice == 2:
+                # Redirect to chapter 6
+                return 5
+            elif choice == 3:
+                # Redirect to chapter 6
+                return 6
+        return current_chapter + 1
+
+
+
+    def update_game_data(self, chapter_title, choice_title):
+        self.game_data.append({
+            'chapter_title': chapter_title,
+            'choice_title': choice_title
+        })
+
+    def save_game_data(self):
+        with open('game_data.json', 'w') as file:
+            json.dump(self.game_data, file)
+
+    def write_to_csv(self):
+        with open('game_data.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Chapter Title', 'Choice Title'])
+            for data in self.game_data:
+                writer.writerow([data['chapter_title'], data['choice_title']])
+
+
+# Создаем роман
+novel = Novel("Мой Роман")
+
+# Остальной код без изменений
+...
+
+# Остальной код без изменений
+...
+# Создаем главы и добавляем их в роман
+chapter1 = Novel.Chapter("Пробуждение", "Вы просыпаетесь утром с ужасной головной болью... Что вы будете делать?")
+chapter1.choices = [
+    {"title": "Вымыть лицо и принять таблетку", "content": "Вымываете лицо и принимаете таблетку. Вам становится лучше..."},
+    {"title": "Лечь спать", "content": "Вы ложитесь спать и наслаждаетесь сном"}
+]
+novel.add_chapter(chapter1)
+
+chapter2 = Novel.Chapter("Таинственный звонок",
+                         "Пока вы моете лицо и завтракаете, слышите звонок В дверь. Что вы будете делать?")
+chapter2.choices = [
+    {"title": "Ответить на дверь", "content": "Вы открываете дверь и получаете повестку в армию. Игра окончена."},
+    {"title": "Сбежать через окно", "content": "Вы паникуете и выбегаете через окно. Вам удается уйти, история продолжается."},
+]
+novel.add_chapter(chapter2)
+
+chapter3 = Novel.Chapter("Незабываемое приключение",
+                         "Поняв, что дома делать нечего, вы решаете сходить в магазин. После входа в магазин у вас есть выбор, что купить...")
+
+chapter3.choices = [
+    {"title": "Купить выпечку и чай", "content": "Вы покупаете выпечку и чай и радостно продолжаете свою прогулку."},
+    {"title": "Купить кофе", "content": "Вы покупаете свою любимое кофе и путь продолжается..."},
+    {"title": "Ничего не покупать", "content": "Вы решаете не тратить деньги и продолжаете свой путь..."},
+]
+novel.add_chapter(chapter3)
+
+chapter4 = Novel.Chapter("Решение всей жизни",
+                         "Идя по улице вы видите красивую девушку которая сразу вам нравится...Ваши действия")
+chapter4.choices = [
+    {"title": "Подойду познакомлюсь", "content": "Вы подходите и знавкомитесь с дамой ее зовут Света вы мило болтаете и ты зовешь ее в кафе"},
+    {"title": "пройду мимо", "content": "Вы прошли мимо..На улице начало темнеть надо решить где спать"},
+]
+novel.add_chapter(chapter4)
+
+
+chapter5 = Novel.Chapter("Внезапное Свидание",
+                         "Вы повели девушку в кафе и она попросила заказать,что-то на свой вкус...Выберите вариант")
+chapter5.choices = [
+    {"title": "Купить ей кофе", "content": "Вы очень хорошо поговорили"},
+    {"title": "Заказать мак комбо ", "content": "Вы покушали"},
+    {"title": "Ничего не покупать", "content": "вы ничего не купили и она ушла"},
+]
+novel.add_chapter(chapter5)
+
+chapter6 = Novel.Chapter("В поисках места для сна",
+                         "Уже темно и надо где-то спать ваши действия")
+chapter6.choices = [
+    {"title": "Спать в парки", "content": "Вы уснули и умерли от холода"},
+    {"title": "пойти к другу", "content": "Вы дошли и спокойно прожили день"},
+
+]
+novel.add_chapter(chapter6)
+novel.print_story()

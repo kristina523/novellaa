@@ -1,0 +1,247 @@
+import json
+import csv
+
+
+class Novel:
+    def __init__(self, title):
+        self.title = title
+        self.chapters = []
+        self.counter = 0
+        self.game_data = []
+
+    class Chapter:
+        def __init__(self, title, content):
+            self.title = title
+            self.content = content
+            self.choices = []
+
+    def add_chapter(self, chapter):
+        self.chapters.append(chapter)
+
+    def print_story(self):
+        current_chapter = 0
+        user_choice = input("Создать нового пользователя (1), найти существующего (2) или удалить пользователя (3)? ")
+
+        if user_choice == "1":
+            user_name = input("Введите имя пользователя: ")
+            print(f"\nПривет, {user_name}! Добро пожаловать в игру.")
+        elif user_choice == "2":
+            user_name = input("Введите имя пользователя: ")
+            user_data = self.load_game_data(user_name)
+            if user_data[1] is not None and user_data[2] is not None:
+                user_name, current_chapter, game_data = user_data
+                print(f"\nПривет, {user_name}! Добро пожаловать обратно в игру.")
+                self.counter = current_chapter
+                self.game_data = game_data
+            else:
+                print("Пользователь не найден. Пожалуйста, создайте нового пользователя.")
+                return
+        elif user_choice == "3":
+            user_name = input("Введите имя пользователя: ")
+            self.delete_user(user_name)
+            return
+        else:
+            print("Неверный выбор. Пожалуйста, выберите 1, 2 или 3.")
+            current_chapter = 0
+
+        while current_chapter < len(self.chapters):
+            chapter = self.chapters[current_chapter]
+            print(f"\nГлава {current_chapter + 1}: {chapter.title}")
+            print(chapter.content)
+
+            if chapter.choices:
+                choice = self.get_user_choice(chapter.choices)
+                if choice == 0:
+                    self.save_game_data(user_name, current_chapter)
+                    print("\nИгра сохранена.")
+                    self.write_to_csv(user_name)  
+                    return
+                next_chapter = chapter.choices[choice - 1]
+                print(f"\nВы выбрали: {next_chapter['title']}")
+                print(next_chapter['content'])
+                self.update_game_data(chapter.title, next_chapter['title'])
+                current_chapter = self.update_counter(current_chapter, choice)
+                if current_chapter is None:
+                    print("\nИгра окончена.")
+                    self.save_game_data(user_name)
+                    self.write_to_csv(user_name)  
+                    return
+                elif current_chapter == 5 and choice == 1:
+                    print("\nИгра окончена.")
+                    self.save_game_data(user_name)
+                    self.write_to_csv(user_name)  
+                    return
+            else:
+                current_chapter += 1
+
+        print("\nКонец истории.")
+        self.save_game_data(user_name)
+        self.write_to_csv(user_name)
+        self.display_csv_data()
+
+    def get_username(self):
+        return input("Введите имя пользователя: ")
+
+    def check_existing_user(self, user_name):
+        with open('game_data.json', 'r') as save_file:
+            data = json.load(save_file)
+            user_data_list = []
+            for user_data in data:
+                if isinstance(user_data, dict) and user_data.get('user_name') == user_name:
+                    current_chapter = user_data.get('current_chapter')
+                    game_data = user_data.get('game_data')
+                    user_data_list.append((user_name, current_chapter, game_data))
+            return user_data_list
+
+    def get_user_choice(self, choices):
+        while True:
+            print("Выберите вариант:")
+            for i, option in enumerate(choices, start=1):
+                print(f"{i}. {option['title']}")
+            print("0. Сохранить игру")
+            choice = input("Введите номер выбранного варианта: ")
+            if choice.isdigit() and 0 <= int(choice) <= len(choices):
+                return int(choice)
+
+    def update_counter(self, current_chapter, choice):
+        if current_chapter == 3:
+            if choice == 1:
+                return 4
+            elif choice == 2:
+                return 5
+            elif choice == 3:
+                return 6
+        return current_chapter + 1
+
+    def update_game_data(self, chapter_title, choice_title):
+        self.game_data.append({
+            'chapter_title': chapter_title,
+            'choice_title': choice_title
+        })
+
+    def save_game_data(self, user_name, current_chapter=None):
+        if current_chapter is None:
+            current_chapter = self.counter
+
+        data = {
+            'user_name': user_name,
+            'current_chapter': current_chapter,
+            'game_data': self.game_data
+        }
+
+        try:
+            with open('game_data.json', 'r') as file:
+                existing_data = json.load(file)
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            existing_data = []
+
+        user_found = False
+        for existing_user_data in existing_data:
+            if existing_user_data['user_name'] == user_name:
+                existing_user_data['current_chapter'] = current_chapter
+                existing_user_data['game_data'] = self.game_data
+                user_found = True
+                break
+
+        if not user_found:
+            existing_data.append(data)
+
+        with open('game_data.json', 'w') as file:
+            file.write(json.dumps(existing_data))
+
+    def load_game_data(self, user_name):
+        try:
+            with open('game_data.json', 'r') as file:
+                existing_data = json.load(file)
+                for data in existing_data:
+                    if data['user_name'] == user_name:
+                        current_chapter = data.get('current_chapter')
+                        game_data = data.get('game_data')
+                        if current_chapter is not None and game_data is not None:
+                            return user_name, current_chapter, game_data
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
+
+        return user_name, None, None
+
+    def write_to_csv(self, user_name):
+        with open('game_data.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            for data in self.game_data:
+                writer.writerow([user_name, data['chapter_title'], data['choice_title']])
+
+
+    def delete_user(self, user_name):
+        if self.check_existing_user(user_name):
+            self.delete_save_data(user_name)
+        else:
+            print("Пользователь не найден.")
+
+    def delete_save_data(self, user_name):
+        try:
+            with open("game_data.json", "r") as f:
+                data = json.load(f)
+            data = [user_data for user_data in data if isinstance(user_data, dict) and user_data.get("user_name") != user_name]
+            with open("game_data.json", "w") as f:
+                json.dump(data, f)
+            print(f"Все данные пользователя {user_name} удалены.")
+        except (FileNotFoundError, json.JSONDecodeError, IOError) as e:
+            print("Произошла ошибка при удалении данных пользователя:", str(e))
+
+
+
+
+novel = Novel("Мой Роман")
+
+chapter1 = Novel.Chapter("Пробуждение", "Вы просыпаетесь утром с ужасной головной болью... Что вы будете делать?")
+chapter1.choices = [
+    {"title": "Вымыть лицо и принять таблетку", "content": "Вымываете лицо и принимаете таблетку. Вам становится лучше..."},
+    {"title": "Лечь спать", "content": "Вы ложитесь спать и наслаждаетесь сном"},
+]
+novel.add_chapter(chapter1)
+
+chapter2 = Novel.Chapter("Таинственный звонок",
+                         "Пока вы моете лицо и завтракаете, слышите звонок В дверь. Что вы будете делать?")
+chapter2.choices = [
+    {"title": "Ответить на дверь", "content": "Вы открываете дверь и получаете повестку в армию. Игра окончена."},
+    {"title": "Сбежать через окно", "content": "Вы паникуете и выбегаете через окно. Вам удается уйти, история продолжается."},
+]
+novel.add_chapter(chapter2)
+
+chapter3 = Novel.Chapter("Незабываемое приключение",
+                         "Поняв, что дома делать нечего, вы решаете сходить в магазин. После входа в магазин у вас есть выбор, что купить...")
+
+chapter3.choices = [
+    {"title": "Купить выпечку и чай", "content": "Вы покупаете выпечку и чай и радостно продолжаете свою прогулку."},
+    {"title": "Купить кофе", "content": "Вы покупаете свою любимое кофе и путь продолжается..."},
+    {"title": "Ничего не покупать", "content": "Вы решаете не тратить деньги и продолжаете свой путь..."},
+]
+novel.add_chapter(chapter3)
+
+chapter4 = Novel.Chapter("Решение всей жизни",
+                         "")
+chapter4.choices = [
+    {"title": "Подойду познакомлюсь", "content": "Вы подходите и знавкомитесь с дамой ее зовут Света вы мило болтаете и ты зовешь ее в кафе"},
+    {"title": "пройду мимо", "content": "Вы прошли мимо..На улице начало темнеть надо решить где спать"},
+]
+novel.add_chapter(chapter4)
+
+
+chapter5 = Novel.Chapter("Внезапное Свидание",
+                         "Вы повели девушку в кафе и она попросила заказать,что-то на свой вкус...Выберите вариант")
+chapter5.choices = [
+    {"title": "Купить ей кофе", "content": "Вы очень хорошо поговорили"},
+    {"title": "Заказать мак комбо ", "content": "Вы покушали "},
+    {"title": "Ничего не покупать", "content": "вы ничего не купили и она ушла"},
+]
+novel.add_chapter(chapter5)
+
+chapter6 = Novel.Chapter("В поисках места для сна",
+                         "Уже темно и надо где-то спать ваши действия")
+chapter6.choices = [
+    {"title": "Спать в парке", "content": "Вы уснули и умерли от холода"},
+    {"title": "пойти к другу", "content": "Вы дошли и спокойно прожили день"},
+
+]
+novel.add_chapter(chapter6)
+novel.print_story()

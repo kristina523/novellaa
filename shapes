@@ -1,0 +1,106 @@
+import math
+
+# Расчет площади прямоугольника
+def calculate_rectangle_area(length, width):
+    return length * width
+
+# Расчет площади квадрата
+def calculate_square_area(side):
+    return side * side
+
+# Расчет площади круга
+def calculate_circle_area(radius):
+    return math.pi * radius * radius
+
+# Расчет площади треугольника
+def calculate_triangle_area(base, height):
+    return 0.5 * base * height
+
+# Расчет площади прямоугольного треугольника
+def calculate_right_triangle_area(base, height):
+    return 0.5 * base * height
+
+# Расчет объема прямоугольного параллелепипеда
+def calculate_rectangular_prism_volume(length, width, height):
+    return length * width * height
+
+# Расчет объема куба
+def calculate_cube_volume(side):
+    return side * side * side
+
+# Расчет объема шара
+def calculate_sphere_volume(radius):
+    return (4/3) * math.pi * radius * radius * radius
+
+# Расчет объема конуса
+def calculate_cone_volume(radius, height):
+    return (1/3) * math.pi * radius * radius * height
+
+# Расчет объема цилиндра
+def calculate_cylinder_volume(radius, height):
+    return math.pi * radius * radius * height
+
+print("Расчет объема и площади геометрических фигур")
+print("Выберите фигуру:")
+print("1. Прямоугольник")
+print("2. Квадрат")
+print("3. Круг")
+print("4. Треугольник")
+print("5. Прямоугольный треугольник")
+print("6. Прямоугольный параллелепипед")
+print("7. Куб")
+print("8. Шар")
+print("9. Конус")
+print("10. Цилиндр")
+
+choice = input("Введите номер фигуры (1-10): ")
+
+if choice == '1':
+    length = float(input("Введите длину прямоугольника: "))
+    width = float(input("Введите ширину прямоугольника: "))
+    area = calculate_rectangle_area(length, width)
+    print("Площадь прямоугольника:", area)
+elif choice == '2':
+    side = float(input("Введите длину стороны квадрата: "))
+    area = calculate_square_area(side)
+    print("Площадь квадрата:", area)
+elif choice == '3':
+    radius = float(input("Введите радиус круга: "))
+    area = calculate_circle_area(radius)
+    print("Площадь круга:", area)
+elif choice == '4':
+    base = float(input("Введите основание треугольника: "))
+    height = float(input("Введите высоту треугольника: "))
+    area = calculate_triangle_area(base, height)
+    print("Площадь треугольника:", area)
+elif choice == '5':
+    base = float(input("Введите основание прямоугольного треугольника: "))
+    height = float(input("Введите высоту прямоугольного треугольника: "))
+    area = calculate_right_triangle_area(base, height)
+    print("Площадь прямоугольного треугольника:", area)
+elif choice == '6':
+    length = float(input("Введите длину прямоугольного параллелепипеда: "))
+    width = float(input("Введите ширину прямоугольного параллелепипеда: "))
+    height = float(input("Введите высоту прямоугольного параллелепипеда: "))
+    volume = calculate_rectangular_prism_volume(length, width, height)
+    print("Объем прямоугольногопараллелепипеда:", volume)
+elif choice == '7':
+    side = float(input("Введите длину стороны куба: "))
+    volume = calculate_cube_volume(side)
+    print("Объем куба:", volume)
+elif choice == '8':
+    radius = float(input("Введите радиус шара: "))
+    volume = calculate_sphere_volume(radius)
+    print("Объем шара:", volume)
+elif choice == '9':
+    radius = float(input("Введите радиус основания конуса: "))
+    height = float(input("Введите высоту конуса: "))
+    volume = calculate_cone_volume(radius, height)
+    print("Объем конуса:", volume)
+elif choice == '10':
+    radius = float(input("Введите радиус основания цилиндра: "))
+    height = float(input("Введите высоту цилиндра: "))
+    volume = calculate_cylinder_volume(radius, height)
+    print("Объем цилиндра:", volume)
+else:
+    print("Неправильный выбор фигуры.")

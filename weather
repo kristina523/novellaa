@@ -1,0 +1,103 @@
+import random
+import keyboard
+
+cities = [
+    "Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург", "Нижний Новгород",
+    "Казань", "Челябинск", "Омск", "Самара", "Ростов-на-Дону",
+    "Уфа", "Красноярск", "Воронеж", "Пермь", "Волгоград",
+    "Краснодар", "Саратов", "Тюмень", "Тольятти", "Ижевск",
+    "Барнаул", "Ульяновск", "Иркутск", "Хабаровск", "Ярославль",
+    "Владивосток", "Махачкала", "Оренбург", "Новокузнецк", "Кемерово",
+    "Рязань", "Томск", "Астрахань", "Пенза", "Липецк",
+    "Тула", "Киров", "Чебоксары", "Курск", "Магнитогорск"
+]
+
+index = random.randint(0, len(cities) - 1)
+city = cities[index]
+
+def update_weather():
+    # Генерация случайных значений
+    temperature = random.randint(-30, 30)
+    humidity = random.randint(0, 100)
+    weather = random.choice(["Ясно", "Облачно", "Дождь", "Снег"])
+    pressure = random.randint(700, 800)
+    wind = random.randint(0, 30)
+
+    # Вывод информации
+    print("Погода в городе", city)
+    print("Температура:", temperature, "°C")
+    print("Влажность:", humidity, "%")
+    print("Погода:", weather)
+    print("Давление:", pressure, "мм рт. ст.")
+    print("Ветер:", wind, "м/с")
+
+def switch_city(increment):
+    global index, city
+
+    index += increment
+    if index < 0:
+        index = len(cities) - 1
+    elif index >= len(cities):
+        index = 0
+
+    city = cities[index]
+    update_weather()
+
+# Инициализация погоды
+update_weather()
+
+# Обработка событий клавиатуры
+keyboard.add_hotkey("up", lambda: switch_city(-1))
+keyboard.add_hotkey("down", lambda: switch_city(1))
+keyboard.wait()  # Ожидание событий клавиатурыimport random
+import keyboard
+
+cities = [
+    "Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург", "Нижний Новгород",
+    "Казань", "Челябинск", "Омск", "Самара", "Ростов-на-Дону",
+    "Уфа", "Красноярск", "Воронеж", "Пермь", "Волгоград",
+    "Краснодар", "Саратов", "Тюмень", "Тольятти", "Ижевск",
+    "Барнаул", "Ульяновск", "Иркутск", "Хабаровск", "Ярославль",
+    "Владивосток", "Махачкала", "Оренбург", "Новокузнецк", "Кемерово",
+    "Рязань", "Томск", "Астрахань", "Пенза", "Липецк",
+    "Тула", "Киров", "Чебоксары", "Курск", "Магнитогорск"
+]
+
+index = random.randint(0, len(cities) - 1)
+city = cities[index]
+
+def update_weather():
+    # Генерация случайных значений
+    temperature = random.randint(-30, 30)
+    humidity = random.randint(0, 100)
+    weather = random.choice(["Ясно", "Облачно", "Дождь", "Снег"])
+    pressure = random.randint(700, 800)
+    wind = random.randint(0, 30)
+
+    # Вывод информации
+    print("Погода в городе", city)
+    print("Температура:", temperature, "°C")
+    print("Влажность:", humidity, "%")
+    print("Погода:", weather)
+    print("Давление:", pressure, "мм рт. ст.")
+    print("Ветер:", wind, "м/с")
+
+def switch_city(increment):
+    global index, city
+
+    index += increment
+    if index < 0:
+        index = len(cities) - 1
+    elif index >= len(cities):
+        index = 0
+
+    city = cities[index]
+    update_weather()
+
+# Инициализация погоды
+update_weather()
+
+# Обработка событий клавиатуры
+keyboard.add_hotkey("up", lambda: switch_city(-1))
+keyboard.add_hotkey("down", lambda: switch_city(1))
+keyboard.wait()  # Ожидание событий клавиатуры

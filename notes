@@ -1,0 +1,76 @@
+notes = {}
+
+def add_note()
+    title = input(Введите название заметки )
+    content = input(Введите текст заметки )
+    notes[title] = content
+    print(Заметка добавлена.)
+
+def delete_note()
+    if len(notes) == 0
+        print(Список заметок пуст.)
+        return
+
+    print(Список заметок)
+    for title in notes
+        print(-  + title)
+
+    title = input(Введите название заметки для удаления )
+    if title in notes
+        del notes[title]
+        print(Заметка удалена.)
+    else
+        print(Заметка с таким названием не найдена.)
+
+def display_notes()
+    if len(notes) == 0
+        print(Список заметок пуст.)
+        return
+
+    print(Список заметок)
+    for title, content in notes.items()
+        print(fnНазвание {title})
+        print(fСодержание {content})
+
+def edit_note()
+    if len(notes) == 0
+        print(Список заметок пуст.)
+        return
+
+    print(Список заметок)
+    for title in notes
+        print(-  + title)
+
+    title = input(Введите название заметки для редактирования )
+    if title in notes
+        new_title = input(Введите новое название заметки )
+        notes[new_title] = notes.pop(title)
+        print(Заметка изменена.)
+    else
+        print(Заметка с таким названием не найдена.)
+
+def menu()
+    print(nМеню)
+    print(1) Добавить заметку)
+    print(2) Удалить заметку)
+    print(3) Вывести список заметок)
+    print(4) Изменить заметку)
+    print(5) Выход)
+
+while True
+    menu()
+    choice = input(Выберите действие (введите номер) )
+
+    if choice == 1
+        add_note()
+    elif choice == 2
+        delete_note()
+    elif choice == 3
+        display_notes()
+    elif choice == 4
+        edit_note()
+    elif choice == 5
+        print(Выход из приложения...)
+        break
+    else
+        print(Нет такой команды.)
